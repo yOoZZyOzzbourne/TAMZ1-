@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+  <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+  <script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
+ <script > 
+
+//NAPOVEDA: https://onsen.io/v2/api/js/ons-range.html
+
+document.addEventListener("init", function(event) {
+  let heightRange = document.getElementById("heightRange");
+  let weightRange = document.getElementById("weightRange");
+  document.getElementById("height").innerHTML = "Height is " + heightRange.value + " cm";
+  document.getElementById("weight").innerHTML = "Weight is " + weightRange.value + " kg"; 
+
+
+  "change drag".split(" ").forEach(function(e) {
+    heightRange.addEventListener(e, function(){
+    document.getElementById("height").innerHTML = "Height is " + this.value + " cm";
+   
+  });
+  })
+    
+  "change drag".split(" ").forEach(function(e) {
+    weightRange.addEventListener(e, function(){
+    document.getElementById("weight").innerHTML = "Weight is " + this.value + " kg"; 
+  });
+  })
+})
+
+var showTemplateDialog = function() {
+
+    var actualDate = new Date();
+        var year = actualDate.getFullYear();
+        var month = actualDate.getMonth()+1; //pozor mesice cislovany od nuly, 0 - leden
+        var day = actualDate.getDate();
+
+  let ranges = ["Underweight", "Normal", "Overweight", "Obese", "Extremely obese"];
+  let bmiForCalculating = [18, 25, 30, 35, 40];
+  var dialog = document.getElementById('my-dialog');
+  var bmi = Math.round(weightRange.value / ((heightRange.value / 100) * (heightRange.value / 100)));
+  var gender = "";
+  var range = "";
+  var name = document.getElementById("username").value
+
+  if (document.getElementById("radio-1").checked == true) {
+    gender = "Male";
+  }
+  if (document.getElementById("radio-2").checked == true) {
+    gender = "Female";
+  }
+  
+  bmiForCalculating.every((element, index) =>  {
+
+    if (bmi >= 40) {
+        range = "Extremely obese"
+        return false;
+    }
+    if (bmi < element){
+        range = ranges[index];
+        return false;
+            }
+
+    return true;
+    }
+  );
+ 
+  if (dialog) {
+   
+    document.getElementById("dialogBMI").innerHTML = "BMI:" + bmi; 
+      document.getElementById("dialogRange").innerHTML = "Range: " + range; 
+      document.getElementById("dialogGender").innerHTML = "Gender: " + gender; 
+      document.getElementById("dialogHeight").innerHTML = "Weight: " + weightRange.value + " kg"; 
+      document.getElementById("dialogWeight").innerHTML = "Height: " + heightRange.value / 100 + " m";
+      document.getElementById("dialogAge").innerHTML = "Age: " + document.getElementById("Age").value; 
+  
+  dialog.show();
+  
+  } else {
+    ons.createElement('dialog.html', { append: true })
+      .then(function(dialog) {
+
+        document.getElementById("dialogBMI").innerHTML = "BMI:" + bmi; 
+      document.getElementById("dialogRange").innerHTML = "Range: " + range; 
+      document.getElementById("dialogGender").innerHTML = "Gender: " + gender; 
+      document.getElementById("dialogHeight").innerHTML = "Weight: " + weightRange.value + " kg"; 
+      document.getElementById("dialogWeight").innerHTML = "Height: " + heightRange.value / 100 + " m";
+      document.getElementById("dialogAge").innerHTML = "Age: " + document.getElementById("Age").value; 
+
+        dialog.show();
+      });
+  }
+
+// Create an "li" node:
+const node = document.createElement("li");
+
+// Create a text node:
+const textnode = document.createTextNode("\n" + day + "/" + month + "/" + year + " || BMI: " + bmi + " - " + name + "\n");
+ 
+// Append the text node to the "li" node:
+node.appendChild(textnode);
+
+// Append the "li" node to the list:
+document.getElementById("list").append(node);
+}
+
+
+var hideDialog = function(id) {
+  document
+    .getElementById(id)
+    .hide();
+};
+
+
+</script>  
+  
+</head>
+<body>
+
+    <ons-tabbar swipeable position="auto">
+        <ons-tab page="page1.html" label="Page 1" icon="md-home" active>
+        </ons-tab>
+        <ons-tab page="page2.html" label="Page 2" icon="ion-ios-menu" >
+        </ons-tab>
+      </ons-tabbar>
+
+
+ <template id="page1.html">
+
+<ons-page id="page1">
+    <ons-toolbar>
+      <div class="center">BMI calculator</div>
+    </ons-toolbar>
+    <ons-card>
+        <div style="text-align: center; line-height: 31px;"> Name </div>
+        <div style="text-align: leading; margin-top: 30px;">
+            <p>
+              <ons-input id="username" modifier="underbar" placeholder="Username" float></ons-input>
+            </p>
+            <p style="margin-top: 30px;">
+            </p>
+          </div>
+      </ons-card>
+  
+      <ons-card>
+        <div style="text-align: center; line-height: 31px;"> Age </div>
+        <div style="text-align: leading; margin-top: 30px;">
+            <p>
+              <ons-input id="Age" modifier="underbar" type="Age" placeholder="Age" float></ons-input>
+            </p>
+            <p style="margin-top: 30px;">
+            </p>
+          </div>
+      </ons-card>
+
+      
+        <div style="text-align: center; line-height: 31px;"> Gender </div>
+      <ons-list>
+        <ons-list-item tappable>
+          <label class="left">
+            <ons-radio name="color" input-id="radio-1" checked></ons-radio>
+          </label>
+          <label for="radio-1" class="center">
+            Male
+            <ons-icon icon="ion-ios-man" style="padding-left: 15px;"></ons-icon> 
+          </label>
+        </ons-list-item>
+        <ons-list-item tappable>
+          <label class="left">
+            <ons-radio name="color" input-id="radio-2"></ons-radio>
+          </label>
+          <label for="radio-2" class="center">
+            Female
+             <ons-icon icon="ion-ios-woman" style="padding-left: 15px;"></ons-icon>
+          </label>
+        </ons-list-item>
+      </ons-list>
+     
+
+    <ons-card>
+      <div style="text-align: center; line-height: 31px;"> Height (cm) </div>
+    <ons-row>
+      <ons-col width="40px" style="text-align: center; line-height: 31px;">
+        <ons-icon icon="md-volume-down"></ons-icon>
+      </ons-col>
+      <ons-col>
+        <ons-range id="heightRange" style="width: 100%;" value="150" max="200" min="100" step="1"></ons-range>
+      </ons-col>
+      <ons-col width="40px" style="text-align: center; line-height: 31px;">
+        <ons-icon icon="md-volume-up"></ons-icon>
+      </ons-col>
+    </ons-row>
+
+    <div id="height" style="font-size:130%; padding-top: 15px;">
+        Height is 
+    </div>
+
+    <div style="text-align: center; line-height: 31px;"> Weight (kg) </div>
+    <ons-row>
+      <ons-col width="40px" style="text-align: center; line-height: 31px;">
+        <ons-icon icon="md-volume-down"></ons-icon>
+      </ons-col>
+      <ons-col>
+        <ons-range id="weightRange" style="width: 100%;" value="75" max="150" min="50" step="1"></ons-range>
+      </ons-col>
+      <ons-col width="40px" style="text-align: center; line-height: 31px;">
+        <ons-icon icon="md-volume-up"></ons-icon>
+      </ons-col>
+    </ons-row>
+
+    <div id="weight" style="font-size:130%; padding-top: 15px;">
+        Weight is 
+    </div>
+    </ons-card>
+
+    <ons-card>
+            <ons-button modifier="large" onclick="showTemplateDialog()">CALCULATE</ons-button>          
+      </ons-card>
+
+</ons-page>
+</template>
+  
+  <template id="dialog.html">
+    <ons-dialog id="my-dialog">
+      <div style="text-align: center; padding: 10px;">
+        <p id="dialogBMI">
+          BMI: 
+        </p>
+        <p id="dialogRange">
+            Range: 
+          </p>
+        <p id="dialogGender">
+          Gender:
+        </p>
+        <p id="dialogHeight">
+            Height:
+          </p>
+        <p id="dialogWeight">
+            Weight:
+          </p>
+          <p id="dialogAge">
+            Age: 
+          </p>
+
+        <p>
+          <ons-button onclick="hideDialog('my-dialog')">Close</ons-button>
+        </p>
+      </div>
+    </ons-dialog>
+  </template>
+
+
+
+   
+  <template id="page2.html">
+    <ons-page id="page2">
+      <ons-toolbar>
+        <div class="center">Last results</div>
+      </ons-toolbar>
+      
+        <ons-list id = "list" style="line-height: 40px;">
+          <ons-list-header>History</ons-list-header>
+           
+        </ons-list>
+      
+     
+      
+    </ons-page>
+  </template>
+
+</body>
+</html>
+

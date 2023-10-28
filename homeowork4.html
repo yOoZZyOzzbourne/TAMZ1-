@@ -1,0 +1,197 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">  
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+  <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+  <script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
+ <script > 
+
+    var month = 0;
+    var day = 0;
+    var year = 0;
+    key = "";
+
+//TODO 0 - upravit tak aby se zobrazoval správný název úkolu v ons-list - DONE
+//TODO 1 - k nazvu ukolu pridat a ulozit i uzivatelem zvolene datum - DONE
+//TODO 2 - doplnit funkci na stisk tlačítka, které odstraní všechny prvky z úložiště - DONE
+//TODO 3 - po zvoleni daneho ukolu zobrazit dialog s možností odstranit úkol - DONE
+//TODO 4 - po zvolení odstranit úkol - tento úkol skutečně odstranit z úložiště - DONE
+//TODO 5 - vytvorit objekt ukol a do uloziste ukladat a nacitat tento objekt pomoci JSON - DONE
+  
+
+document.addEventListener('init', function(event)
+{
+    showTodo();    
+});
+
+function addTask()
+{
+    taskName = document.getElementById("taskName").value + " - " + day + "/" + month + "/" + year;
+    //náhodně vygenerované ID (na ukázku) - pokuste se najít lepší způsob, např. pomocí datum/čas - DONE
+    var myKey = self.crypto.randomUUID()
+
+    const obj = {name: document.getElementById("taskName").value, day: day, month: month, year: year};
+    const myJSON = JSON.stringify(obj);
+    console.log(myJSON);
+
+    //localStorage.setItem(myKey, taskName);    
+    localStorage.setItem(myKey,myJSON);
+    showTodo();
+}
+
+function removeAll()
+{
+    localStorage.clear();
+    ons.notification.alert("Remove All Items"); 
+    showTodo();
+}
+
+function itemClick(item)
+{   
+    ons.notification.alert("item: " + item);     
+}
+
+
+function showTodo()
+{
+    $("#onsList").empty();
+    //prochazim zaznamy uloziste
+    for (var i = 0; i < localStorage.length; i++)
+    {
+        //ziskam klic z uloziste pro pristup k zaznamu
+        var myKey = localStorage.key(i);  
+
+        //jedna z moznych cest jak si pro kazdy zaznam v listu udrzovat id do uloziste
+        //pro kazdy item (node) v listu se vytvori pomoci setAttribute (onclick) s funkci itemClick()
+        //po kliknuti na item je s nim mozne dale pracovat ve fuknci itemClick()
+        //neni to jedina cesta jak ziskat id do uloziste, pro kazdy prvek z listu 
+        //pro ukol muzete pouzit i jine reseni
+        var name = localStorage.getItem(myKey)
+
+        const obj = JSON.parse(name);
+
+
+        const node = document.createElement("ons-list-item");
+        //node.innerText = name;   
+        node.innerText = obj.name + " - " + obj.day + "/" + obj.month + "/" + obj.year;
+
+        document.getElementById("onsList").appendChild(node);
+    }
+
+    const close = document.querySelectorAll("ons-list-item");
+        for(let i =0; i<close.length; i++) {
+            close[i].addEventListener("click", ()=> {
+                //let key = localStorage.key(i);
+                key = localStorage.key(i);
+                //console.log(key);
+                //itemClick(localStorage.getItem(key));
+                addDialog2(localStorage.getItem(key), key)
+            })
+        }
+}
+
+function addDialog()
+{
+    document.getElementById('dialog-1').show();
+}
+
+function closeDialog()
+{
+    document.getElementById('dialog-1').hide();
+}
+
+function closeDialog2()
+{
+    document.getElementById('dialog-2').hide();
+}
+
+function setDays(inputDate)
+{
+    var myDate = new Date(inputDate);
+    month = myDate.getMonth() + 1;
+    day = myDate.getDate();
+    year = myDate.getFullYear();
+}
+
+
+function addDialog2(item, key) {
+    const obj = JSON.parse(item);
+    document.getElementById("oneTaskName").innerHTML = obj.name;
+    document.getElementById("dialog-2").show();
+}
+
+function removeOneTask() {
+    localStorage.removeItem(key);
+        document.getElementById("dialog-2").hide();
+        key = "";
+        showTodo();
+}
+</script>  
+  
+</head>
+<body>
+<ons-navigator swipeable id="myNavigator" page="page1.html"></ons-navigator>
+
+<template id="page1.html">
+    <ons-page id="page1">
+        <ons-toolbar>
+            <div class="center">Local Storage</div>
+        </ons-toolbar>
+
+        <p>TODO List</p>
+
+        <ons-list id="onsList" style="line-height: 25px;">
+            
+        </ons-list>
+
+        <ul id="htmlList">
+        </ul>
+
+            <ons-button modifier="material" id="push-button1" onclick="addDialog()">Add Task Using Dialog</ons-button>
+            <ons-button modifier="material" id="push-button2" onclick="removeAll()">Remove All</ons-button>
+    </ons-page>
+</template>
+
+<ons-dialog id="dialog-1">
+
+    <div style="text-align: center; padding: 10px;">
+
+    <p>
+      <ons-input id="taskName" modifier="underbar" placeholder="Task Name" float></ons-input>
+    </p>       
+
+        <p style="text-align: center; padding-bottom: 15px">
+            <input style="font-size:200%" id="dateInput" type="date" modifier="underbar material" onchange="setDays(this.value);">
+        </p>
+        
+
+    <p><ons-button modifier="material" id="push-button3" onclick="addTask()">Add Task</ons-button></p> 
+    <p><ons-button modifier="material" id="push-button4" onclick="closeDialog()">Close</ons-button></p>       
+    </div>
+    
+</ons-dialog>
+
+<ons-dialog id="dialog-2">
+
+    <div style="text-align: center; padding: 10px;">
+
+        <p>Task</p>
+
+    <p>
+      <ons-input id="oneTaskName" modifier="underbar" float></ons-input>
+    </p>       
+
+    <p><ons-button modifier="material" id="push-button3" onclick="removeOneTask()">Remove task</ons-button></p> 
+    <p><ons-button modifier="material" id="push-button4" onclick="closeDialog2()">Close</ons-button></p>       
+    </div>
+    
+</ons-dialog>
+
+</body>
+</html>
+
+

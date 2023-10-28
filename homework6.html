@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+  <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+  <script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
+ <script > 
+    
+//NAPOVEDA: https://onsen.io/v2/api/js/ons-range.html
+
+baseString = "";
+
+async function sendCode() {
+    let url = document.getElementById("url").value;
+    let login = document.getElementById("login").value
+    let timestamp = Date.now();
+
+    let request = url;
+
+    let myObject = await fetch(request, {
+    method: "POST", // *GET, POST, PUT, DELETE, etc.
+    //mode: "cors", // no-cors, *cors, same-origin
+    //cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+    //credentials: "same-origin", // include, *same-origin, omit
+    headers: {
+      //"Content-Type": "application/json",
+      // 'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: "Bearer " + baseString,
+    },
+    //redirect: "follow", // manual, *follow, error
+    //referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+    //body: JSON.stringify(data), // body data type must match "Content-Type" header
+  });
+
+
+  let myText = await myObject.text();
+  document.getElementById("textArea3").innerText = "Final message:  " + myText; 
+
+
+ 
+}
+
+
+async function getCode() {
+    let url = document.getElementById("url").value;
+    let login = document.getElementById("login").value
+    let timestamp = Date.now();
+
+    let request = url + "?" + "user=" + login + "&timestamp=" + timestamp;
+
+    let myObject = await fetch(request);
+  let myText = await myObject.text();
+    
+    document.getElementById("textArea1").innerText = "Recieved Secret Data:  " + myText; 
+
+    let decodedText = atob(myText);
+    baseString = myText;
+
+    document.getElementById("textArea2").innerText = "Decoded Secret Data (atob):  " + decodedText;
+
+    document.getElementById("sendCode").disabled = false
+}
+
+</script>  
+  
+</head>
+<body>
+
+<ons-page id="page1">
+    <ons-toolbar>
+      <div class="center">AJAX</div>
+    </ons-toolbar>
+    <ons-card>
+        <div style="text-align: center; line-height: 31px;"> </div>
+        <div style="text-align: leading; margin-top: 30px;">
+            <p>
+              <ons-input id="url" modifier="underbar" style="width: 75%"; placeholder="URL" float></ons-input>
+            </p>
+            <p>
+                <ons-input id="login" modifier="underbar" placeholder="Login" float></ons-input>
+              </p>
+            <p style="margin-top: 30px;">
+            </p>
+          </div>
+      </ons-card>
+  
+      <ons-card>
+        <p>
+            <section style="padding: 0 8px 8px">
+                <textarea id="textArea1" class="textarea" ng-model="dialogTextField" placeholder="Recieved Secret Data" style="width: 100%; height: 100px;"></textarea>
+              </section>
+          </p> 
+
+          <p>
+            <section style="padding: 0 8px 8px">
+                <textarea id="textArea2" class="textarea" ng-model="dialogTextField" placeholder="Decoded Secret Data (atob)" style="width: 100%; height: 100px;"></textarea>
+              </section>
+          </p> 
+
+          <p>
+            <section style="padding: 0 8px 8px">
+                <textarea id="textArea3" class="textarea" ng-model="dialogTextField" placeholder="Final message" style="width: 100%; height: 100px;"></textarea>
+              </section>
+          </p> 
+      </ons-card>
+      
+
+    <ons-card>
+        <p>
+            <ons-button modifier="large"   onclick="getCode()">Get Code</ons-button>  
+        </p>
+              
+        <p>
+            <ons-button id="sendCode" disabled="true" modifier="large" onclick="sendCode()">Send Code</ons-button>     
+        </p>  
+    </ons-card>
+
+</ons-page>
+</body>
+</html>
+
