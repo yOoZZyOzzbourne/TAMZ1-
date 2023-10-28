@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Terminy</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
+    <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+    <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+    <script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
+<script >
+
+//pomocne pole
+var names = ["kozoroh", "Vodnář","Ryby","Beran","Býk","Blíženci","Rak","Lev","Panna","Váhy","Štír","Střelec"];
+var namesND = ["kozoroh", "vodnar","ryby","beran","byk","blizenci","rak","lev","panna","vahy","stir","strelec"];
+var breakDate = [21,20,21,21,21,22,23,24,23,23,23,22];
+var globalMonth = 1;
+
+document.addEventListener('init', function(event) {
+    var page = event.target;
+
+    // po nacteni stranky se zobrazi aktualni datum a posle se do funkce setDays
+    if (page.id === 'page1')
+    {
+        var actualDate = new Date();
+        var year = actualDate.getFullYear();
+        var month = actualDate.getMonth()+1; //pozor mesice cislovany od nuly, 0 - leden
+        var day = actualDate.getDate();
+
+        
+
+        // TODO 0. Zobrazit aktuální datum DONE
+        var date1 = new Date("05/13/2023"); 
+        var date2 = new Date("03/23/2023");
+        var date3 = new Date("04/26/2023");
+
+        var aDate = new Date(month + "/" + day + "/" + year);
+
+        var d1 = Math.abs(date1-aDate);
+        date1Formatted = d1/(1000 * 3600 * 24);
+
+        var d2 = Math.abs(date2-aDate);
+        date2Formatted = d2/(1000 * 3600 * 24);
+
+        var d3 = Math.abs(date3-aDate);
+        date3Formatted = d3/(1000 * 3600 * 24);
+
+
+        document.getElementById("actualDate").innerHTML = "Dnešní datum: " + day + "/" + month + "/" + year;
+        document.getElementById("date-1").innerHTML = "Konec semestru: " + Math.round(date1Formatted);
+        document.getElementById("date-2").innerHTML = "Vědecká rada: " + Math.round(date2Formatted);
+        document.getElementById("date-3").innerHTML = "Sportovní den: " + Math.round(date3Formatted);
+        /*
+          TODO 1. upravit aby se zobrazovaly spravne dny, ktere zbyvaji do terminu DONE
+          dulezite terminy si muzete upravit podle sebe, datum zubare, doktor atd.
+          https://www.w3schools.com/jsref/jsref_obj_date.asp
+          harmonogram semestru https://www.vsb.cz/cs/student/harmonogram/
+          spravnost vysledku muzete overit zde: https://www.timeanddate.com/date/durationresult.html
+        */
+
+    }
+
+});
+
+
+function setDays(inputDate)
+{
+    var myDate = new Date(inputDate);
+
+    var aDate = new Date();
+
+    var d4 = Math.abs(myDate-aDate);
+    date4Formatted = d4/(1000 * 3600 * 24);
+
+    document.getElementById("date-4").innerHTML = "Počet dnů do zvoleného data: " + Math.round(date4Formatted);
+
+   // ons.notification.alert("y: " + myDate.getFullYear());
+
+    // TODO 2. upravit aby se zobrazovaly spravne dny do zvoleného termínu / mohou být například narozeniny DONE
+
+    // TODO 3. zobrazit spravne znameni na zaklade zvoleneho data
+
+    var month = myDate.getMonth() + 1;
+    var day = myDate.getDate();
+    
+    globalMonth = Math.round(month);
+
+    if (breakDate[globalMonth] < day) {
+        globalMonth = globalMonth + 1
+    }
+
+    var path = namesND[globalMonth] + ".png";
+    document.getElementById("zodImg").setAttribute("src", path)
+    document.getElementById("zodiacName").innerHTML = names[globalMonth + plusOrMinus];
+
+}
+
+// klik na obrazek znameni zobrazeni aktualni horoskop
+function loadURL()
+{
+    var name = namesND[globalMonth];
+    //  ons.notification.alert(name);
+   // window.location.assign("http://www.horoskopy.cz/" + name);
+    /*
+      TODO 4. zobrazeni aktualniho horoskopu ke zvolenemu datu, ktere uzivatel zada v TODO 2 DONE
+      napr. spustit url ve tvaru "http://www.horoskopy.cz/" + name
+      nebo "https://www.denik.cz/horoskopy/zverokruh/" + name + ".html"
+      napoveda: zde hledejte sekci Window Location Assign: https://www.w3schools.com/js/js_window_location.asp
+    */
+    window.location.assign("http://www.horoskopy.cz/" + name);
+    // BONUS: TODO 4. vyřešit pomocí onsen dialogu + HTML iframe elementu - který je v tomto dialogu umístěn
+
+    var showTemplateDialog = function() {
+  var dialog = document.getElementById('my-dialog');
+
+  if (dialog) {
+    dialog.show();
+  } else {
+    ons.createElement('dialog.html', { append: true })
+      .then(function(dialog) {
+        dialog.show();
+        
+      });
+  }
+};
+var hideDialog = function(id) {
+  document
+    .getElementById(id)
+    .hide();
+};
+}
+
+function docWrite(variable) {
+    document.write(variable);
+}
+
+</script>
+</head>
+<body>
+<ons-page id="page1">
+
+    <ons-toolbar>
+      <div class="center" style="font-size:150%">Termíny</div>
+    </ons-toolbar>
+
+    <ons-card>
+        <div id="actualDate" style="font-size:130%; padding-top: 15px; padding-bottom: 15px">
+            Dnešní datum:
+        </div>
+    </ons-card>
+
+    <ons-card>
+        <div id="date-1" style="font-size:130%; padding-top: 15px;">
+            Konec semestru:
+        </div>
+        <div id="date-2" style="font-size:130%; padding-top: 15px;">
+            Vědecká rada: 
+        </div>
+        <div id="date-3" style="font-size:130%; padding-top: 15px; padding-bottom: 15px">
+            Sportovní den: 
+        </div>
+    </ons-card>
+
+    <ons-card>
+        <div style="font-size:150%; text-align: center; padding-top: 25px;">
+            Zadej datum
+        </div>
+        <p style="text-align: center; padding-bottom: 15px">
+            <input style="font-size:200%" id="dateInput" type="date" modifier="underbar material" onchange="setDays(this.value);">
+        </p>
+        <div id="date-4" style="font-size:130%; padding-top: 15px; padding-bottom: 15px">
+            Počet dnů do zvoleného data: 
+        </div>
+    </ons-card>
+
+    <ons-card>
+        <p style="text-align: center">
+            <img onclick="loadURL()" id="zodImg" style="width: 25%; height: auto">
+        </p>
+        <div id="zodiacName" style="font-size:130%; text-align: center;">
+        </div>
+    </ons-card>
+</ons-page>
+</body>
+</html>
